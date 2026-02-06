@@ -1,6 +1,6 @@
 {
   "name": "@jorgemadrid/open-carousel",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "A high-performance infinite scroll carousel for React",
   "homepage": "https://jorgemadridportillo.github.io/open-carousel/",
   "type": "module",
