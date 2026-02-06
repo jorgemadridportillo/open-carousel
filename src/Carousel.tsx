@@ -72,6 +72,10 @@ export interface BaseCarouselProps<T> {
     infinite?: boolean
     onEndReached?: () => void
     hasNextPage?: boolean
+    /** Custom label for previous button (aria-label). Defaults to 'Previous' */
+    prevLabel?: string
+    /** Custom label for next button (aria-label). Defaults to 'Next' */
+    nextLabel?: string
     /** 
      * CSS variable name for item width. Uses native CSS media queries for responsive widths.
      * Options: 'default' | 'review' | 'compact' | 'collection' | 'wide'
@@ -155,6 +159,8 @@ function BaseCarouselInner<T>({
     debug,
     eagerSelectionOnMobile = false,
     initialIndex,
+    prevLabel = 'Previous',
+    nextLabel = 'Next',
 }: BaseCarouselProps<T>) {
     // Resolve gap: use prop if provided, otherwise determine from viewport
     const resolvedGap = gapProp ?? (
@@ -853,7 +859,12 @@ function BaseCarouselInner<T>({
                 paddingBottom: verticalPadding
             }}
         >
-            <CarouselArrow direction="left" onClick={() => handleArrowClick('left')} className="prev" />
+            <CarouselArrow
+                direction="left"
+                onClick={() => handleArrowClick('left')}
+                className="prev"
+                label={prevLabel}
+            />
 
             {/* SKELETON LOADER OVERLAY - shows while infinite carousel initializes */}
             {infinite && !isReady && (
@@ -1022,7 +1033,12 @@ function BaseCarouselInner<T>({
                     )
                 }), [allItems, infinite, bufferBeforeCount, items.length, getItemKey, renderItem, widthCssValue, itemClassName, scrollToThisItem])}
             </div>
-            <CarouselArrow direction="right" onClick={() => handleArrowClick('right')} className="next" />
+            <CarouselArrow
+                direction="right"
+                onClick={() => handleArrowClick('right')}
+                className="next"
+                label={nextLabel}
+            />
         </div >
     )
 }

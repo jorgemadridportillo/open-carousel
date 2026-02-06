@@ -1,13 +1,14 @@
 import clsx from 'clsx'
-import { useTranslation } from 'react-i18next'
+import type { ComponentProps } from 'react'
 
 type Direction = 'left' | 'right'
 
-interface CarouselArrowProps {
+interface CarouselArrowProps extends ComponentProps<'button'> {
     direction: Direction
     onClick: () => void
     disabled?: boolean
     className?: string
+    label?: string
 }
 
 export function CarouselArrow({
@@ -15,8 +16,10 @@ export function CarouselArrow({
     onClick,
     disabled = false,
     className,
+    label,
+    ...props
 }: CarouselArrowProps) {
-    const { t } = useTranslation()
+    const defaultLabel = direction === 'left' ? 'Previous' : 'Next'
 
     return (
         <button
@@ -28,13 +31,14 @@ export function CarouselArrow({
                 'disabled:opacity-0 disabled:cursor-not-allowed disabled:pointer-events-none', // State modifiers
                 className,
             )}
-            aria-label={direction === 'left' ? t('carousel.previous') : t('carousel.next')}
+            aria-label={label || defaultLabel}
             onPointerDown={(e) => {
                 // Prevent this event from bubbling to the container or triggering "ghost" clicks
                 e.stopPropagation()
                 // Prevent focus ring or text selection
                 e.preventDefault()
             }}
+            {...props}
         >
             {direction === 'left' ? (
                 <svg
