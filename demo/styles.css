@@ -321,3 +321,191 @@ body {
     -ms-overflow-style: none;
     scrollbar-width: none;
 }
+
+/* -----------------------------------------------------------------
+   3. New Visual Styles
+   ----------------------------------------------------------------- */
+
+/* Normal Card */
+.visual-card-normal {
+    height: 100%;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.visual-card-normal img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+}
+
+.visual-card-normal .content {
+    padding: 16px;
+    color: #1f2937;
+}
+
+.visual-card-normal h3 {
+    font-size: 1.125rem;
+    margin-bottom: 8px;
+    color: #111827;
+}
+
+.visual-card-normal p {
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+/* Super Cool Card */
+.visual-card-cool {
+    height: 100%;
+    aspect-ratio: 3/4;
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.visual-card-cool .bg-image {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.visual-card-cool .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.visual-card-cool .content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 24px;
+    transform: translateY(20px);
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.visual-card-cool h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.visual-card-cool .tag {
+    display: inline-block;
+    padding: 4px 12px;
+    background: rgba(255,255,255,0.2);
+    backdrop-filter: blur(4px);
+    border-radius: 100px;
+    font-size: 0.75rem;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease 0.1s;
+}
+
+/* Cool Card Hover Effects */
+.visual-card-cool:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+}
+
+.visual-card-cool:hover .bg-image {
+    transform: scale(1.1);
+}
+
+.visual-card-cool:hover .overlay {
+    opacity: 0.8;
+}
+
+.visual-card-cool:hover .content {
+    transform: translateY(0);
+}
+
+.visual-card-cool:hover .tag {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* -----------------------------------------------------------------
+   4. Documentation Styles
+   ----------------------------------------------------------------- */
+
+.doc-section {
+    max-width: 900px;
+    margin: 80px auto;
+    padding: 0 20px;
+}
+
+.doc-section h2 {
+    font-size: 2rem;
+    margin-bottom: 24px;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.doc-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 32px;
+}
+
+.props-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+}
+
+.props-table th,
+.props-table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.props-table th {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.props-table td {
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+}
+
+.props-table code {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    color: #a5b4fc;
+    font-size: 0.875rem;
+}
+
+.props-table .required {
+    color: #f87171;
+    font-size: 0.75rem;
+    margin-left: 4px;
+}
