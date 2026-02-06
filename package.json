@@ -1,8 +1,11 @@
 {
-  "name": "open-carousel",
+  "name": "@jorgemadrid/open-carousel",
   "version": "0.1.0",
   "description": "A high-performance infinite scroll carousel for React",
   "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
