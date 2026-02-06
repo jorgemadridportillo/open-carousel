@@ -22,7 +22,7 @@ npm install open-carousel
 ## Quick Start
 
 ```tsx
-import { BaseCarousel } from 'open-carousel'
+import { Carousel } from 'open-carousel'
 import 'open-carousel/styles.css'
 
 const items = [
@@ -33,7 +33,7 @@ const items = [
 
 function MyCarousel() {
   return (
-    <BaseCarousel
+    <Carousel
       items={items}
       getItemKey={(item) => item.id}
       renderItem={(item) => (
@@ -55,7 +55,9 @@ function MyCarousel() {
 | `getItemKey` | `(item: T, index: number) => string` | required | Unique key extractor |
 | `renderItem` | `(item: T, index: number, helpers) => ReactNode` | required | Item renderer |
 | `infinite` | `boolean` | `false` | Enable infinite scrolling |
-| `itemWidthVar` | `'default' \| 'review' \| 'compact' \| 'collection'` | `'default'` | CSS variable for item width |
+| `itemWidthCssVar` | `string` | - | **Recommended**: Custom CSS variable for width |
+| `itemWidthVar` | `'default' \| 'review' \| ...` | `'default'` | Legacy: Predefined width variant |
+| `initialIndex` | `number` | `0` | Start at specific index |
 | `gap` | `number` | auto | Gap between items in pixels |
 | `snap` | `boolean` | `true` | Enable CSS scroll snapping |
 | `snapType` | `'mandatory' \| 'proximity'` | `'mandatory'` | Snap behavior type |
@@ -69,24 +71,32 @@ function MyCarousel() {
 | `prevLabel` | `string` | `'Previous'` | Aria label for previous button |
 | `nextLabel` | `string` | `'Next'` | Aria label for next button |
 
-## CSS Variables
-
-Define these CSS variables to control responsive item widths:
-
-```css
-:root {
-  --carousel-item-width-default: 200px;
-  --carousel-item-width-review: 300px;
-  --carousel-item-width-compact: 150px;
-  --carousel-item-width-collection: 250px;
-}
-
-@media (min-width: 768px) {
-  :root {
-    --carousel-item-width-default: 280px;
-  }
-}
-```
+## 📏 Responsive Item Widths (Recommended)
+ 
+ The most flexible way to control item widths is using your own CSS variable and `itemWidthCssVar`.
+ 
+ **1. Define Variable in CSS**
+ ```css
+ /* styles.css */
+ :root {
+   --my-card-width: 220px;
+ }
+ 
+ @media (min-width: 768px) {
+   :root {
+     --my-card-width: 300px;
+   }
+ }
+ ```
+ 
+ **2. Pass to Component**
+ ```tsx
+ <Carousel
+   itemWidthCssVar="--my-card-width"
+   items={items}
+   // ...
+ />
+ ```
 
 ## Advanced Usage
 
@@ -111,7 +121,7 @@ import {
 Enable debug logging for development:
 
 ```tsx
-<BaseCarousel
+<Carousel
   items={items}
   debugId="my-carousel"
   debug={{ channels: { NAV: true, TELEPORT: true } }}
