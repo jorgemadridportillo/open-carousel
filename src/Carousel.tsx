@@ -19,21 +19,22 @@ import { createLogger, type DebugChannel, type ChannelConfig } from './logger'
 
 /** 
 /** Available CSS variable names for carousel item widths */
-export type CarouselWidthVar = 'default' | 'review' | 'compact' | 'collection'
+export type CarouselWidthVar = 'default' | 'review' | 'compact' | 'collection' | 'wide'
 
 /** SSR fallback width - matches CSS :root default for default variant */
 const SSR_FALLBACK_WIDTH = 170
 
 /** 
- * Map CSS variable name to Tailwind width class.
- * IMPORTANT: These must be LITERAL STRINGS so Tailwind can find them during build.
- * Dynamic construction like \`w-[var(${x})]\` will be purged!
+ * Map CSS variable name to inline style value with fallback.
+ * Fallback ensures carousel works without consumer defining CSS variables.
+ * Consumers can override by defining their own CSS variables.
  */
-const WIDTH_CLASSES: Record<CarouselWidthVar, string> = {
-    default: 'w-[var(--carousel-item-width-default)]',
-    review: 'w-[var(--carousel-item-width-review)]',
-    compact: 'w-[var(--carousel-item-width-compact)]',
-    collection: 'w-[var(--carousel-item-width-collection)]',
+const CSS_VAR_WITH_FALLBACK: Record<CarouselWidthVar, string> = {
+    default: 'var(--carousel-item-width-default, 200px)',
+    review: 'var(--carousel-item-width-review, 280px)',
+    compact: 'var(--carousel-item-width-compact, 150px)',
+    collection: 'var(--carousel-item-width-collection, 100px)',
+    wide: 'var(--carousel-item-width-wide, 350px)',
 }
 
 /** Map CSS variable name to the actual CSS property name (for getComputedStyle) */
@@ -42,17 +43,26 @@ const CSS_VAR_MAP: Record<CarouselWidthVar, string> = {
     review: '--carousel-item-width-review',
     compact: '--carousel-item-width-compact',
     collection: '--carousel-item-width-collection',
+    wide: '--carousel-item-width-wide',
 }
 
 /**
  * Get the computed item width from CSS variable.
  * This reads the actual computed value from the browser, which respects media queries.
+ * @param cssVarOrName - Either a raw CSS variable string (e.g., '--my-width') or a CarouselWidthVar name
+ * @param fallback - Fallback width if CSS variable is undefined (default: SSR_FALLBACK_WIDTH)
  */
-export const getComputedItemWidth = (varName: CarouselWidthVar = 'default'): number => {
-    if (typeof window === 'undefined') return SSR_FALLBACK_WIDTH
-    const cssVar = CSS_VAR_MAP[varName]
+export const getComputedItemWidth = (
+    cssVarOrName: string | CarouselWidthVar = 'default',
+    fallback: number = SSR_FALLBACK_WIDTH
+): number => {
+    if (typeof window === 'undefined') return fallback
+    // If it starts with '--', it's already a CSS variable name
+    const cssVar = cssVarOrName.startsWith('--')
+        ? cssVarOrName
+        : CSS_VAR_MAP[cssVarOrName as CarouselWidthVar]
     const value = getComputedStyle(document.documentElement).getPropertyValue(cssVar)
-    return parseInt(value, 10) || SSR_FALLBACK_WIDTH
+    return parseInt(value, 10) || fallback
 }
 
 export interface BaseCarouselProps<T> {
@@ -64,9 +74,21 @@ export interface BaseCarouselProps<T> {
     hasNextPage?: boolean
     /** 
      * CSS variable name for item width. Uses native CSS media queries for responsive widths.
-     * Options: 'default' | 'review' | 'compact' | 'collection'
+     * Options: 'default' | 'review' | 'compact' | 'collection' | 'wide'
+     * @deprecated Use itemWidthCssVar for full flexibility
      */
     itemWidthVar?: CarouselWidthVar
+    /**
+     * Custom CSS variable name for item width (e.g., '--my-carousel-item-width').
+     * Use this for full flexibility - define your own CSS variable with responsive breakpoints.
+     * Takes precedence over itemWidthVar when provided.
+     */
+    itemWidthCssVar?: string
+    /**
+     * Fallback width in pixels when using itemWidthCssVar and the CSS variable is undefined.
+     * Required when using itemWidthCssVar. Defaults to 200 if not provided.
+     */
+    fallbackWidth?: number
     itemClassName?: string
     snapType?: 'mandatory' | 'proximity'
 
@@ -117,6 +139,8 @@ function BaseCarouselInner<T>({
     onEndReached,
     hasNextPage = false,
     itemWidthVar = 'default',
+    itemWidthCssVar,
+    fallbackWidth = 200,
     itemClassName = '',
     snapType = 'mandatory',
     disableOpacityEffect = false,
@@ -143,8 +167,12 @@ function BaseCarouselInner<T>({
     // ═══════════════════════════════════════════════════════════════════════════
     const logger = useMemo(() => createLogger(debugId, debug), [debugId, debug])
 
-    // CSS variable class for item width - uses native CSS media queries
-    const widthClass = WIDTH_CLASSES[itemWidthVar]
+    // Resolve width CSS - custom variable takes precedence over named variant
+    const widthCssValue = itemWidthCssVar
+        ? `var(${itemWidthCssVar}, ${fallbackWidth}px)`
+        : CSS_VAR_WITH_FALLBACK[itemWidthVar]
+    // Raw CSS variable name for getComputedStyle
+    const widthCssVar = itemWidthCssVar || CSS_VAR_MAP[itemWidthVar]
 
     // Performance tracking - uses logger's timer for consistent metrics
     const initTimerRef = useRef(logger.createTimer())
@@ -306,7 +334,7 @@ function BaseCarouselInner<T>({
         // Get expected width from CSS variable.
         // CSS variables handle responsive widths natively via media queries,
         // avoiding the SSR timing issues of the old JS-based approach.
-        const expectedWidth = getComputedItemWidth(itemWidthVar)
+        const expectedWidth = getComputedItemWidth(widthCssVar, fallbackWidth)
         const widthDiff = Math.abs(cardWidth - expectedWidth)
 
         // Consider "measured" if width is within 10px of expected value
@@ -840,7 +868,8 @@ function BaseCarouselInner<T>({
                     {Array.from({ length: 8 }).map((_, i) => (
                         <div
                             key={i}
-                            className={`flex-shrink-0 ${widthClass} ${itemClassName}`}
+                            className={`flex-shrink-0 ${itemClassName}`}
+                            style={{ width: widthCssValue }}
                         >
                             {renderSkeleton ? renderSkeleton(i) : (
                                 <div className="w-full h-full bg-gradient-to-br from-gray-100 via-gray-200 to-gray-100 animate-pulse rounded-md" style={{ minHeight: '200px' }} />
@@ -979,8 +1008,9 @@ function BaseCarouselInner<T>({
                     return (
                         <div
                             key={key}
-                            className={`carousel-item flex-shrink-0 ${widthClass} ${itemClassName} cursor-pointer ${snapAlignment} snap-stop-always`}
+                            className={`carousel-item flex-shrink-0 ${itemClassName} cursor-pointer ${snapAlignment} snap-stop-always`}
                             style={{
+                                width: widthCssValue,
                                 WebkitFontSmoothing: 'subpixel-antialiased',
                                 WebkitTapHighlightColor: 'transparent',
                                 scrollSnapStop: 'always',
@@ -990,7 +1020,7 @@ function BaseCarouselInner<T>({
                             {renderItem(item, realIndex, { scrollToItem: () => scrollToThisItem(index) })}
                         </div>
                     )
-                }), [allItems, infinite, bufferBeforeCount, items.length, getItemKey, renderItem, widthClass, itemClassName, scrollToThisItem])}
+                }), [allItems, infinite, bufferBeforeCount, items.length, getItemKey, renderItem, widthCssValue, itemClassName, scrollToThisItem])}
             </div>
             <CarouselArrow direction="right" onClick={() => handleArrowClick('right')} className="next" />
         </div >

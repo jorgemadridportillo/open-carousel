@@ -222,7 +222,7 @@ describe('BaseCarousel Component', () => {
             />
         )
         const firstItem = container.querySelector('.carousel-item')
-        expect(firstItem).toHaveClass('w-[var(--carousel-item-width-review)]')
+        expect(firstItem).toHaveStyle({ width: 'var(--carousel-item-width-review, 280px)' })
     })
     it('maintains fixed DOM size in infinite mode (no memory leaks)', () => {
         const itemsCount = mockItems.length
@@ -1026,6 +1026,22 @@ describe('BaseCarousel Component', () => {
                 get() { return 500 } // Smaller than scrollWidth
             })
 
+            // Mock getComputedStyle for width variables to match cardWidth
+            // This ensures expectedWidth === measured.cardWidth so logic proceeds without correction
+            const originalGetComputedStyle = window.getComputedStyle
+            window.getComputedStyle = (element: Element) => {
+                const style = originalGetComputedStyle(element)
+                return {
+                    ...style,
+                    getPropertyValue: (prop: string) => {
+                        if (prop.startsWith('--carousel-item-width') || prop.startsWith('--')) {
+                            return `${cardWidth}px`
+                        }
+                        return style.getPropertyValue(prop)
+                    }
+                } as CSSStyleDeclaration
+            }
+
             // Capture style assignments through a proxy-like approach
             const originalSetProperty = CSSStyleDeclaration.prototype.setProperty
             const styleSpy = vi.fn((property: string, value: string) => {
@@ -1078,6 +1094,7 @@ describe('BaseCarousel Component', () => {
                     if (originalScrollLeft) Object.defineProperty(Element.prototype, 'scrollLeft', originalScrollLeft)
                     if (originalScrollWidth) Object.defineProperty(Element.prototype, 'scrollWidth', originalScrollWidth)
                     if (originalClientWidth) Object.defineProperty(Element.prototype, 'clientWidth', originalClientWidth)
+                    window.getComputedStyle = originalGetComputedStyle
                 }
             }
         }

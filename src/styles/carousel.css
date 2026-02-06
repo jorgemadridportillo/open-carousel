@@ -25,8 +25,7 @@
 
 .carousel-item {
     flex-shrink: 0;
-    /* CRITICAL: Force width to match the CSS variable that JS expects */
-    width: var(--carousel-item-width-default);
+    /* Width is applied via inline style to support itemWidthVar prop */
 }
 
 /* Dynamic width utility for collections */
@@ -88,7 +87,16 @@
     .carousel-button svg { width: 32px; height: 32px; }
 }
 
-:root {
-    /* Carousel Width Variables Default */
-    --carousel-item-width-default: 200px;
-}
+/*
+ * CSS Variables - Define these in your app's CSS:
+ * 
+ * :root {
+ *   --carousel-item-width-default: 200px;
+ *   --carousel-item-width-review: 250px;
+ *   --carousel-item-width-compact: 150px;
+ *   --carousel-item-width-collection: 100px;
+ * }
+ * 
+ * Use media queries for responsive widths:
+ * @media (min-width: 768px) { :root { --carousel-item-width-default: 280px; } }
+ */
