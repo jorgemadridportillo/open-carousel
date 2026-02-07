@@ -96,8 +96,8 @@ describe('BaseCarousel Component', () => {
                 renderItem={renderItem}
             />
         )
-        expect(screen.getByLabelText('Anterior')).toBeInTheDocument()
-        expect(screen.getByLabelText('Siguiente')).toBeInTheDocument()
+        expect(screen.getByLabelText('Previous')).toBeInTheDocument()
+        expect(screen.getByLabelText('Next')).toBeInTheDocument()
     })
 
     // Obsolete test removed: 'infinite carousel disables scroll snap on arrow click and restores after animation'
@@ -112,7 +112,7 @@ describe('BaseCarousel Component', () => {
                 infinite={false}
             />
         )
-        const nextButton = screen.getByLabelText('Siguiente')
+        const nextButton = screen.getByLabelText('Next')
         const carouselContainer = container.querySelector('.base-carousel') as HTMLElement
 
         // Mock scroll methods
@@ -150,7 +150,7 @@ describe('BaseCarousel Component', () => {
                 infinite={false}
             />
         )
-        const prevButton = screen.getByLabelText('Anterior')
+        const prevButton = screen.getByLabelText('Previous')
         const carousel = container.querySelector('.base-carousel') as HTMLElement
         // Force scrollLeft to 0 to simulate start of finite carousel
 
@@ -383,7 +383,7 @@ describe('BaseCarousel Component', () => {
                     infinite={true}
                 />
             )
-            const nextButton = screen.getByLabelText('Siguiente')
+            const nextButton = screen.getByLabelText('Next')
             const carousel = container.querySelector('.base-carousel') as HTMLElement
 
             // Mock scroll APIs
@@ -419,7 +419,7 @@ describe('BaseCarousel Component', () => {
                     infinite={true}
                 />
             )
-            const nextButton = screen.getByLabelText('Siguiente')
+            const nextButton = screen.getByLabelText('Next')
             const carousel = container.querySelector('.base-carousel') as HTMLElement
 
             // Mock scroll APIs
@@ -453,7 +453,7 @@ describe('BaseCarousel Component', () => {
                     infinite={true}
                 />
             )
-            const prevButton = screen.getByLabelText('Anterior')
+            const prevButton = screen.getByLabelText('Previous')
             const carousel = container.querySelector('.base-carousel') as HTMLElement
 
             // Mock scroll APIs
@@ -491,7 +491,7 @@ describe('BaseCarousel Component', () => {
                     infinite={true}
                 />
             )
-            const nextButton = screen.getByLabelText('Siguiente')
+            const nextButton = screen.getByLabelText('Next')
             const carousel = container.querySelector('.base-carousel') as HTMLElement
 
             // Spy on addEventListener
